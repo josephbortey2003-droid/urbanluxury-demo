@@ -44,7 +44,8 @@ a{color:inherit}
 .slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.02)}
 @media (prefers-reduced-motion:no-preference){.slide.on img{animation:kb 9s ease-out forwards}@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.14)}}}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(9,9,11,.15),rgba(9,9,11,.7) 75%),linear-gradient(180deg,rgba(9,9,11,.65) 0%,rgba(9,9,11,0) 25%,rgba(9,9,11,0) 55%,rgba(9,9,11,.92) 100%);z-index:1}
-.hero>*:not(.slide){position:relative;z-index:2}
+.herovid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%}
+.hero>*:not(.herovid){position:relative;z-index:2}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:calc(22px + env(safe-area-inset-top,0px)) 0}
 .bar nav{display:flex;gap:34px;font:400 11px var(--sans);letter-spacing:.3em;text-transform:uppercase}
 .bar nav a{text-decoration:none;color:#e8e2d4}.bar nav a:hover{color:var(--gold2)}
@@ -160,10 +161,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;b
 <body>
 
 <header class="hero" id="top">
-  <div class="slide on"><img src="img/bedroom2.webp" alt="Bedroom with floor-to-ceiling windows over the city"></div>
-  <div class="slide"><img src="img/pool.webp" alt="Rooftop pool at sunset"></div>
-  <div class="slide"><img src="img/living.webp" alt="Living room with a blue sofa"></div>
-  <div class="slide"><img src="img/exterior.webp" alt="The Gallery residence on Boundary Road"></div>
+  <video class="herovid" autoplay muted loop playsinline preload="auto" poster="img/hero-poster.jpg" aria-hidden="true"><source src="img/hero.mp4" type="video/mp4"></video>
   <div class="wrap bar">
     <nav aria-label="Sections"><a href="#residences">Residences</a><a href="#amenities">Amenities</a><a href="#gallery">Gallery</a></nav>
     <a class="call" href="#reserve">Reserve · 055 452 9407</a>
@@ -181,7 +179,6 @@ footer::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;b
     <div><label for="qg">Guests</label><select id="qg"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5+</option></select></div>
     <a class="btn" id="qsend" href="#" target="_blank" rel="noopener">Reserve</a>
   </form>
-  <div class="dots" id="dots" aria-label="Choose a photo"></div>
 </header>
 
 <main>
@@ -270,11 +267,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;b
 const $=id=>document.getElementById(id), iso=d=>d.toISOString().slice(0,10), now=Date.now();
 const fmt=v=>v?new Date(v+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'?';
 const nights=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
-const slides=[...document.querySelectorAll('.slide')], dots=$('dots'); let si=0, timer;
-slides.forEach((_,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Photo '+(k+1));b.onclick=()=>{go(k);restart();};dots.appendChild(b);});
-function go(k){si=(k+slides.length)%slides.length;slides.forEach((s,n)=>{s.classList.toggle('on',n===si);if(n===si){const im=s.querySelector('img');im.style.animation='none';im.offsetHeight;im.style.animation='';}});[...dots.children].forEach((d,n)=>d.setAttribute('aria-current',n===si));}
-function restart(){clearInterval(timer);if(!matchMedia('(prefers-reduced-motion: reduce)').matches)timer=setInterval(()=>go(si+1),6500);}
-go(0);restart();
+const hv=document.querySelector('.herovid'); if(matchMedia('(prefers-reduced-motion: reduce)').matches){hv.removeAttribute('autoplay');hv.pause();}
 $('qin').value=iso(new Date(now+10*864e5)); $('qout').value=iso(new Date(now+13*864e5)); $('qin').min=iso(new Date(now));
 function qupd(){const n=nights($('qin').value,$('qout').value);
   const m=`Hello Urban Luxury, I'd like to reserve.\nResidence: ${$('qres').value}\nArrive: ${fmt($('qin').value)}\nDepart: ${fmt($('qout').value)}${n>0?` (${n} night${n>1?'s':''})`:''}\nGuests: ${$('qg').value}`;
