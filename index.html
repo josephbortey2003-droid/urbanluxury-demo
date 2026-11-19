@@ -71,7 +71,9 @@ a{color:inherit}
   .concierge>div{border-bottom:1px solid var(--hair)}
   .concierge>div:nth-child(2){border-right:0}
   .concierge .btn{grid-column:1/-1}
-  .crest h1{letter-spacing:.18em;margin-right:-.18em}
+  .crest h1{letter-spacing:.2em;margin-right:-.2em;line-height:1.05;font-size:clamp(44px,13vw,80px)}
+  .crest h1 span{display:block}
+  .crest p.tag{padding-inline:12px}
   .dots{display:none}
 }
 
@@ -168,7 +170,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;b
   </div>
   <div class="crest">
     <img src="img/mark.png" alt="">
-    <h1 class="goldtext">URBAN LUXURY</h1>
+    <h1 class="goldtext"><span>URBAN</span> <span>LUXURY</span></h1>
     <div class="rule kicker">Residences · Accra</div>
     <p class="tag">Live above the city in East Legon &amp; Cantonments</p>
   </div>
