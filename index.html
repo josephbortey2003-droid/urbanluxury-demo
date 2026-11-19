@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Urban Luxury Apartment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&display=swap">
+<style>
+/* Layout (Skyline Residences template + a scroll-driven viewing): full-bleed building hero with a huge lowercase wordmark,
+   statement top-left, "Book a viewing" pill, bottom info rail ("scroll to walk through"). Then the tour: a pinned full-screen
+   stage where scrolling walks room to room (cross-fade + slow zoom), with a room counter, a vertical progress bar and a mini
+   floor plan that lights up the current room. Then facilities, other locations, a review and the booking form.
+   Single dark theme in Urban Luxury's own black + gold. */
+:root{
+  --bg:#0F0F0E;
+  --panel:#181816;
+  --line:rgba(255,255,255,.14);
+  --text:#F2EFE8;
+  --soft:#A9A396;
+  --gold:#C9A84C;     /* their building mark, sampled #B7983F, lifted a touch for contrast on black */
+  --sans:"Sora", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--text);font:300 16px/1.6 var(--sans);margin:0}
+.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-weight:300;margin:0;letter-spacing:-.03em;line-height:1}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
+.pillbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#111;border-radius:8px;padding:11px 16px;font:500 14px var(--sans);text-decoration:none;border:0;cursor:pointer}
+.pillbtn::after{content:"";width:7px;height:7px;border-radius:50%;background:#111}
+.ghost{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:10px 14px;font-size:14px;text-decoration:none;background:rgba(0,0,0,.2);backdrop-filter:blur(6px)}
+.ghost::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+/* hero */
+.hero{position:relative;min-height:min(100vh,920px);display:flex;flex-direction:column;overflow:hidden}
+.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.1) 30%,rgba(0,0,0,.15) 60%,rgba(0,0,0,.75));z-index:1}
+.hero>*:not(img){position:relative;z-index:2}
+.nav{display:flex;align-items:center;gap:24px;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand img{height:34px}
+.brand span{font-weight:400;font-size:15px;letter-spacing:.02em}
+.nav nav{display:flex;gap:26px;margin-inline:auto;font-size:15px}
+.nav nav a{text-decoration:none;opacity:.9}.nav nav a:hover{color:var(--gold)}
+.statement{display:flex;justify-content:space-between;gap:30px;margin-top:22px}
+.statement p{font-size:clamp(18px,1.8vw,24px);line-height:1.35;max-width:24ch}
+.statement .r{max-width:28ch;font-size:15px;color:#e6e2d8;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.word{margin-top:auto;font-weight:200;font-size:clamp(68px,15vw,250px);letter-spacing:-.06em;line-height:.8;white-space:nowrap}
+.rail{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;border-top:1px solid rgba(255,255,255,.25);margin-top:22px;padding-block:16px calc(16px + env(safe-area-inset-bottom,0px));font-size:14px;color:#ddd}
+.rail .c{border-left:1px solid rgba(255,255,255,.4);padding-left:12px}
+.rail .r{text-align:right}
+@media (max-width:820px){.nav nav{display:none}.nav{justify-content:space-between}.statement{flex-direction:column}.word{font-size:clamp(56px,17vw,120px);white-space:normal}.rail{grid-template-columns:1fr}.rail .c,.rail .r{display:none}}
+
+/* tour */
+.tour{position:relative}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#000}
+.shot{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+.shot.on{opacity:1}
+.shot img{width:100%;height:100%;object-fit:cover;transform:scale(var(--z,1));transform-origin:var(--o,50% 50%);will-change:transform}
+.stage::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.65),rgba(0,0,0,.05) 50%),linear-gradient(0deg,rgba(0,0,0,.55),transparent 40%);pointer-events:none}
+.hud{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;padding:0 max(24px,env(safe-area-inset-right,0px)) calc(34px + env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px));pointer-events:none}
+.hud .count{font-size:14px;color:var(--gold);letter-spacing:.14em}
+.hud h2{font-size:clamp(46px,8vw,120px);font-weight:200;margin-top:6px}
+.hud p{max-width:40ch;color:#e5e1d6;margin-top:10px;font-size:17px}
+.bar{position:absolute;left:max(24px,env(safe-area-inset-left,0px));top:96px;bottom:40%;width:2px;background:rgba(255,255,255,.2);z-index:3}
+.bar i{display:block;width:100%;background:var(--gold);height:0}
+.plan{position:absolute;right:max(24px,env(safe-area-inset-right,0px));bottom:calc(34px + env(safe-area-inset-bottom,0px));z-index:3;width:220px;background:rgba(15,15,14,.72);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:12px}
+.plan small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:8px}
+.plan svg{width:100%;height:auto;display:block}
+.plan rect,.plan path{fill:rgba(255,255,255,.04);stroke:rgba(255,255,255,.35);stroke-width:1}
+.plan .on{fill:rgba(201,168,76,.45);stroke:var(--gold)}
+.plan text{font:400 7px var(--sans);fill:#cfc9bb}
+.tourtop{position:absolute;top:calc(24px + env(safe-area-inset-top,0px));left:max(56px,env(safe-area-inset-left,0px));right:max(24px,env(safe-area-inset-right,0px));z-index:3;display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#ddd;pointer-events:none}
+.tourtop a{pointer-events:auto}
+.steps{height:calc(var(--n) * 100vh)}
+@media (max-width:820px){.plan{width:150px;padding:8px;bottom:auto;top:calc(64px + env(safe-area-inset-top,0px))}.plan small{display:none}.hud h2{font-size:52px}.tourtop .ghost{display:none}}
+
+/* after tour */
+section{padding-block:90px}
+.label{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.big{font-size:clamp(34px,4.6vw,64px);font-weight:200;margin-top:12px}
+.fac{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:40px}
+.fac div{background:var(--bg);padding:26px}
+.fac b{display:block;font-weight:400;font-size:20px}
+.fac span{color:var(--soft);font-size:14px}
+@media (max-width:760px){.fac{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.locs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:40px}
+.loc{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.loc .imgs{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:2px;height:300px}
+.loc .imgs img{width:100%;height:100%;object-fit:cover}
+.loc .imgs img:first-child{grid-row:span 2}
+.loc .solo{height:300px;width:100%;object-fit:cover}
+.loc .in{padding:22px;display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap}
+.loc h3{font-size:26px;font-weight:300}
+.loc p{color:var(--soft);font-size:14px;margin-top:4px}
+@media (max-width:820px){.locs{grid-template-columns:1fr}}
+.quote{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:center}
+.quote q{font-size:clamp(24px,2.8vw,38px);font-weight:200;line-height:1.25;quotes:"“" "”"}
+.quote cite{display:block;font-style:normal;color:var(--soft);margin-top:16px;font-size:14px}
+.quote img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px}
+@media (max-width:820px){.quote{grid-template-columns:1fr}}
+.book{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,4vw,48px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:40px}
+.book .calls{margin-top:24px;display:grid;gap:6px;color:var(--soft)}
+.book .calls b{color:var(--text);font-weight:400}
+form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+form .full{grid-column:1/-1}
+label{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:6px}
+input,select{width:100%;min-width:0;font:400 16px var(--sans);color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px}
+select option{color:#111}
+form .pillbtn{width:100%;justify-content:center}
+.nights{font-size:14px;color:var(--gold)}
+@media (max-width:820px){.book{grid-template-columns:1fr}}
+@media (max-width:440px){form{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--line);padding-block:26px calc(26px + env(safe-area-inset-bottom,0px));color:var(--soft);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center}
+footer img{height:30px}
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <img src="img/exterior.webp" alt="The Gallery apartment building on Boundary Road, East Legon">
+  <div class="wrap nav">
+    <a class="brand" href="#top"><img src="img/mark.png" alt=""><span>Urban Luxury Apartment</span></a>
+    <nav aria-label="Sections"><a href="#tour">The tour</a><a href="#facilities">Facilities</a><a href="#locations">Locations</a></nav>
+    <a class="pillbtn" href="#book">Book a stay</a>
+  </div>
+  <div class="wrap statement">
+    <p>Furnished apartments at The Gallery, East Legon. Rooftop pool, quiet rooms, open 24 hours.</p>
+    <div class="r">Studio, one- and two-bedroom apartments for short stays and longer lets.<a class="ghost" href="#tour">Start the tour</a></div>
+  </div>
+  <div class="wrap" style="margin-top:auto">
+    <h1 class="word">urban luxury</h1>
+    <div class="rail"><span>The Gallery · Boundary Road, East Legon</span><span class="c">Scroll to walk through the apartment</span><span class="r">★ 4.9 · 47 Google reviews</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="tour" id="tour">
+    <div class="stage" id="stage">
+      <div class="shot on" data-o="50% 40%"><img src="img/exterior.webp" alt="The Gallery building from the street"></div>
+      <div class="shot" data-o="40% 60%"><img src="img/living.webp" alt="Living room with a blue sofa and mustard cushions"></div>
+      <div class="shot" data-o="50% 60%"><img src="img/dining.webp" alt="Dining table set with plates and fresh fruit"></div>
+      <div class="shot" data-o="45% 55%"><img src="img/bedroom.webp" alt="Double bedroom with bedside lamps"></div>
+      <div class="shot" data-o="70% 40%"><img src="img/bedroom2.webp" alt="Second bedroom with a red armchair and a city view"></div>
+      <div class="shot" data-o="50% 55%"><img src="img/pool.webp" alt="The rooftop pool at sunset"></div>
+      <div class="shot" data-o="50% 50%"><img src="img/night.webp" alt="The courtyard lit up at night"></div>
+      <div class="tourtop"><span>The Gallery · Viewing</span><a class="ghost" href="#book">Skip to booking</a></div>
+      <div class="bar" aria-hidden="true"><i id="barfill"></i></div>
+      <div class="hud" aria-live="polite"><span class="count" id="cnt">01 / 07</span><h2 id="rname">Arrival</h2><p id="rline">The Gallery on Boundary Road: a secure, modern block in the heart of East Legon.</p></div>
+      <div class="plan" aria-hidden="true">
+        <small>You are here</small>
+        <svg viewBox="0 0 160 110">
+          <rect id="pl0" x="4" y="92" width="152" height="14" rx="2"/><text x="64" y="102">Entrance</text>
+          <rect id="pl1" x="4" y="38" width="82" height="52" rx="2"/><text x="30" y="66">Living</text>
+          <rect id="pl2" x="88" y="62" width="68" height="28" rx="2"/><text x="110" y="79">Dining</text>
+          <rect id="pl3" x="4" y="4" width="64" height="32" rx="2"/><text x="24" y="23">Bed 1</text>
+          <rect id="pl4" x="70" y="4" width="50" height="32" rx="2"/><text x="84" y="23">Bed 2</text>
+          <rect id="pl5" x="122" y="4" width="34" height="56" rx="2"/><text x="126" y="34">Roof</text>
+          <rect id="pl6" x="88" y="38" width="32" height="22" rx="2"/><text x="91" y="52">Night</text>
+        </svg>
+      </div>
+    </div>
+    <div class="steps" id="steps" style="--n:7"></div>
+  </div>
+
+  <section id="facilities">
+    <div class="wrap">
+      <div class="label">Facilities</div>
+      <h2 class="big">Everything for a comfortable stay.</h2>
+      <div class="fac">
+        <div><b>Studio, 1 &amp; 2-bed</b><span>fully furnished apartments</span></div>
+        <div><b>Fitted kitchen</b><span>cook your own meals</span></div>
+        <div><b>Swimming pool</b><span>rooftop, with sunset views</span></div>
+        <div><b>Gym</b><span>stay on routine while away</span></div>
+        <div><b>Restaurant</b><span>on site when you'd rather not cook</span></div>
+        <div><b>Open 24 hours</b><span>check in when your flight lands</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="locations" style="padding-top:0">
+    <div class="wrap">
+      <div class="label">Our locations</div>
+      <h2 class="big">More places to stay.</h2>
+      <div class="locs">
+        <article class="loc"><div class="imgs"><img src="img/oasis-bed.webp" alt="Bedroom at Oasis Park Residence"><img src="img/oasis-kitchen.webp" alt="Open kitchen and lounge at Oasis Park Residence"><img src="img/oasis-terrace.webp" alt="Rooftop terrace at Oasis Park Residence"></div>
+          <div class="in"><div><h3>Oasis Park Residence</h3><p>East Legon · Studio, 1 &amp; 2-bed apartments</p></div><a class="ghost" href="#book" data-loc="Oasis Park Residence, East Legon">Ask for dates</a></div></article>
+        <article class="loc"><div class="solo" style="display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,rgba(201,168,76,.18),transparent 60%),#141412"><img src="img/mark.png" alt="" style="height:120px;width:auto"></div>
+          <div class="in"><div><h3>Embassy Gardens</h3><p>Cantonments · Furnished apartments</p></div><a class="ghost" href="#book" data-loc="Embassy Gardens, Cantonments">Ask for dates</a></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap quote">
+      <div><div class="label">From our guests</div><p style="margin-top:16px"><q>Really enjoyed my stay. Clean and quiet! When I'm choosing a stay, serenity is my topmost concern, and that's exactly what The Gallery gave me.</q></p><cite>Cillia P., Google review · ★★★★★</cite></div>
+      <img src="img/pool.webp" alt="Rooftop pool at sunset">
+    </div>
+  </section>
+
+  <section id="book" style="padding-top:0">
+    <div class="wrap book">
+      <div>
+        <div class="label">Book direct</div>
+        <h2 class="big">Your dates. Your apartment.</h2>
+        <p style="color:var(--soft);margin-top:14px;max-width:38ch">Send your dates and we'll reply on WhatsApp with availability and today's rate.</p>
+        <div class="calls"><span>WhatsApp <b>055 452 9407</b></span><span>Bookings <b>057 932 9053</b></span></div>
+      </div>
+      <form id="bk" novalidate>
+        <div class="full"><label for="loc">Location</label><select id="loc"><option>The Gallery, East Legon</option><option>Oasis Park Residence, East Legon</option><option>Embassy Gardens, Cantonments</option></select></div>
+        <div><label for="ci">Check-in</label><input id="ci" type="date"></div>
+        <div><label for="co">Check-out</label><input id="co" type="date"></div>
+        <div><label for="apt">Apartment</label><select id="apt"><option>Studio</option><option selected>1 bedroom</option><option>2 bedrooms</option></select></div>
+        <div><label for="gu">Guests</label><select id="gu"><option>1 guest</option><option selected>2 guests</option><option>3 guests</option><option>4 guests</option><option>5+ guests</option></select></div>
+        <div class="full"><label for="nm">Your name</label><input id="nm" autocomplete="name" placeholder="e.g. Ama Boateng"></div>
+        <div class="full nights" id="nights"></div>
+        <div class="full"><a class="pillbtn" id="send" href="#" target="_blank" rel="noopener">Send request on WhatsApp</a></div>
+      </form>
+    </div>
+  </section>
+</main>
+<footer><div class="wrap"><img src="img/mark.png" alt="Urban Luxury Apartment"><span>© 2026 Urban Luxury Apartment · The Gallery, Boundary Road, East Legon · @urbanluxury_apartment</span></div></footer>
+
+<script>
+(function(){
+const ROOMS=[
+ ['Arrival','The Gallery on Boundary Road: a secure, modern block in the heart of East Legon.'],
+ ['Living room','Settle in on the sofa. Bright, comfortable and roomy enough for family.'],
+ ['Dining','Breakfast for two or dinner with friends, right by the window.'],
+ ['Bedroom','A proper double bed and soft bedside lighting for real rest.'],
+ ['Second bedroom','More space for family or colleagues, with views over the city.'],
+ ['Rooftop pool','End the day with a swim as the sun goes down over Accra.'],
+ ['Evenings','Quiet evenings with the courtyard lit up below.']];
+const shots=[...document.querySelectorAll('.shot')], steps=document.getElementById('steps'), N=shots.length;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+shots.forEach(s=>s.querySelector('img').style.setProperty('--o',s.dataset.o));
+let cur=-1;
+function onScroll(){
+  const r=steps.getBoundingClientRect(), total=steps.offsetHeight-innerHeight;
+  const p=Math.min(Math.max(-r.top/Math.max(total,1),0),0.9999);
+  const f=p*N, i=Math.floor(f), local=f-i;
+  if(i!==cur){
+    cur=i; shots.forEach((s,k)=>s.classList.toggle('on',k===i));
+    document.getElementById('cnt').textContent=String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0');
+    document.getElementById('rname').textContent=ROOMS[i][0];
+    document.getElementById('rline').textContent=ROOMS[i][1];
+    for(let k=0;k<N;k++){const el=document.getElementById('pl'+k); if(el) el.classList.toggle('on',k===i);}
+  }
+  if(!reduce) shots[i].querySelector('img').style.setProperty('--z',(1+local*0.12).toFixed(4));
+  document.getElementById('barfill').style.height=(p*100).toFixed(1)+'%';
+}
+addEventListener('scroll',onScroll,{passive:true}); addEventListener('resize',onScroll); onScroll();
+// booking
+const $=id=>document.getElementById(id), iso=d=>d.toISOString().slice(0,10), now=Date.now();
+$('ci').value=iso(new Date(now+10*864e5)); $('co').value=iso(new Date(now+13*864e5)); $('ci').min=iso(new Date(now));
+const fmt=v=>v?new Date(v+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'?';
+function upd(){
+  const n=Math.round((new Date($('co').value)-new Date($('ci').value))/864e5);
+  $('nights').textContent=n>0?`${n} night${n>1?'s':''} · ${fmt($('ci').value)} → ${fmt($('co').value)}`:'Check-out must be after check-in.';
+  let m=`Hello Urban Luxury, I'd like to book.\nLocation: ${$('loc').value}\nApartment: ${$('apt').value}\nCheck-in: ${fmt($('ci').value)}\nCheck-out: ${fmt($('co').value)}${n>0?` (${n} night${n>1?'s':''})`:''}\nGuests: ${$('gu').value}`;
+  if($('nm').value.trim()) m+=`\nName: ${$('nm').value.trim()}`;
+  $('send').href='https://wa.me/233554529407?text='+encodeURIComponent(m);
+}
+['loc','ci','co','apt','gu','nm'].forEach(id=>$(id).addEventListener('input',upd));
+document.querySelectorAll('[data-loc]').forEach(a=>a.addEventListener('click',()=>{$('loc').value=a.dataset.loc;upd();}));
+$('bk').addEventListener('submit',e=>e.preventDefault());
+upd();
+})();
+</script>
+
+</body>
+</html>
