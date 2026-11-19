@@ -36,25 +36,57 @@ a{color:inherit}
 .ghost{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:10px 14px;font-size:14px;text-decoration:none;background:rgba(0,0,0,.2);backdrop-filter:blur(6px)}
 .ghost::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
 
-/* hero */
-.hero{position:relative;min-height:min(100vh,920px);display:flex;flex-direction:column;overflow:hidden}
-.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
-.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.1) 30%,rgba(0,0,0,.15) 60%,rgba(0,0,0,.75));z-index:1}
-.hero>*:not(img){position:relative;z-index:2}
-.nav{display:flex;align-items:center;gap:24px;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+/* hero: listing-style opening — nav, title row with rating, 5-photo gallery with tour button, booking card */
+.top{position:relative;z-index:30;background:rgba(15,15,14,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:24px;padding-block:calc(14px + env(safe-area-inset-top,0px)) 14px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand img{height:34px}
-.brand span{font-weight:400;font-size:15px;letter-spacing:.02em}
-.nav nav{display:flex;gap:26px;margin-inline:auto;font-size:15px}
-.nav nav a{text-decoration:none;opacity:.9}.nav nav a:hover{color:var(--gold)}
-.statement{display:flex;justify-content:space-between;gap:30px;margin-top:22px}
-.statement p{font-size:clamp(18px,1.8vw,24px);line-height:1.35;max-width:24ch}
-.statement .r{max-width:28ch;font-size:15px;color:#e6e2d8;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
-.word{margin-top:auto;font-weight:200;font-size:clamp(68px,15vw,250px);letter-spacing:-.06em;line-height:.8;white-space:nowrap}
-.rail{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;border-top:1px solid rgba(255,255,255,.25);margin-top:22px;padding-block:16px calc(16px + env(safe-area-inset-bottom,0px));font-size:14px;color:#ddd}
-.rail .c{border-left:1px solid rgba(255,255,255,.4);padding-left:12px}
-.rail .r{text-align:right}
-@media (max-width:820px){.nav nav{display:none}.nav{justify-content:space-between}.statement{flex-direction:column}.word{font-size:clamp(56px,17vw,120px);white-space:normal}.rail{grid-template-columns:1fr}.rail .c,.rail .r{display:none}}
+.brand span{font-weight:400;font-size:16px;letter-spacing:.02em}
+.nav nav{display:flex;gap:26px;margin-inline:auto;font-size:15px;color:#d8d3c7}
+.nav nav a{text-decoration:none}.nav nav a:hover{color:var(--gold)}
+.listing{padding-block:28px 10px}
+.titlerow{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+.titlerow h1{font-size:clamp(30px,3.6vw,48px);font-weight:300;letter-spacing:-.03em}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;color:#d8d3c7;font-size:15px}
+.meta b{color:var(--gold);font-weight:600}
+.titlerow .acts{display:flex;gap:10px}
+.gallery{position:relative;display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:8px;margin-top:22px;border-radius:18px;overflow:hidden}
+.gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.gallery figure{margin:0;overflow:hidden;position:relative}
+.gallery figure:hover img{transform:scale(1.04)}
+.gallery .g1{grid-row:span 2}
+.gallery figcaption{position:absolute;left:12px;bottom:10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.55);padding:4px 10px;border-radius:999px}
+.gallery .tourbtn{position:absolute;right:16px;bottom:16px;z-index:2;background:#fff;color:#111;border-radius:10px;padding:12px 16px;font:600 14px var(--sans);text-decoration:none;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.gallery .tourbtn::before{content:"▶";font-size:11px}
+.below{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:40px;padding-block:34px 70px;align-items:start}
+.below h2{font-size:28px;font-weight:300}
+.below .lead{color:#d8d3c7;margin-top:12px;max-width:52ch}
+.hl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:24px}
+.hl div{display:flex;gap:12px;align-items:flex-start;border-top:1px solid var(--line);padding-top:14px}
+.hl i{font-style:normal;color:var(--gold);font-size:18px;line-height:1.3}
+.hl b{display:block;font-weight:400}
+.hl span{color:var(--soft);font-size:14px}
+.card{position:sticky;top:90px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.card .from{font-size:14px;color:var(--soft)}
+.card .from b{color:var(--text);font-size:22px;font-weight:400}
+.card .grid2{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
+.card .grid2>div{padding:10px 12px;min-width:0}
+.card .grid2>div+div{border-left:1px solid var(--line)}
+.card .grid2 .full{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}
+.card label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+.card input,.card select{width:100%;min-width:0;border:0;background:transparent;color:var(--text);font:400 15px var(--sans);padding:0}
+.card .pillbtn{width:100%;justify-content:center;margin-top:14px;background:var(--gold);color:#111}
+.card .pillbtn::after{background:#111}
+.card .note{font-size:12px;color:var(--soft);text-align:center;margin-top:10px}
+@media (max-width:900px){
+  .nav nav{display:none}.nav{justify-content:space-between}
+  .gallery{grid-template-columns:1fr 1fr;grid-template-rows:260px 150px}
+  .gallery .g1{grid-column:1/-1;grid-row:auto}
+  .gallery .g4,.gallery .g5{display:none}
+  .below{grid-template-columns:1fr}
+  .card{position:static}
+  .titlerow .acts{display:none}
+}
 
 /* tour */
 .tour{position:relative}
@@ -124,20 +156,49 @@ footer img{height:30px}
 </head>
 <body>
 
-<header class="hero" id="top">
-  <img src="img/exterior.webp" alt="The Gallery apartment building on Boundary Road, East Legon">
-  <div class="wrap nav">
-    <a class="brand" href="#top"><img src="img/mark.png" alt=""><span>Urban Luxury Apartment</span></a>
-    <nav aria-label="Sections"><a href="#tour">The tour</a><a href="#facilities">Facilities</a><a href="#locations">Locations</a></nav>
-    <a class="pillbtn" href="#book">Book a stay</a>
+<div class="top"><div class="wrap nav">
+  <a class="brand" href="#top"><img src="img/mark.png" alt=""><span>Urban Luxury Apartment</span></a>
+  <nav aria-label="Sections"><a href="#tour">Tour</a><a href="#facilities">Facilities</a><a href="#locations">Locations</a></nav>
+  <a class="pillbtn" href="#book">Book a stay</a>
+</div></div>
+
+<header class="wrap listing" id="top">
+  <div class="titlerow">
+    <div>
+      <h1>Furnished apartments at The Gallery, East Legon</h1>
+      <div class="meta"><span><b>★ 4.9</b> · 47 Google reviews</span><span>Boundary Road, East Legon</span><span>Rooftop pool</span><span>Open 24 hours</span></div>
+    </div>
+    <div class="acts"><a class="ghost" href="#tour">Take the tour</a></div>
   </div>
-  <div class="wrap statement">
-    <p>Furnished apartments at The Gallery, East Legon. Rooftop pool, quiet rooms, open 24 hours.</p>
-    <div class="r">Studio, one- and two-bedroom apartments for short stays and longer lets.<a class="ghost" href="#tour">Start the tour</a></div>
+  <div class="gallery">
+    <figure class="g1"><img src="img/bedroom2.webp" alt="Bedroom with a red armchair and floor-to-ceiling windows over the city"><figcaption>Bedroom with a view</figcaption></figure>
+    <figure class="g2"><img src="img/living.webp" alt="Living room with a blue sofa"><figcaption>Living room</figcaption></figure>
+    <figure class="g3"><img src="img/pool.webp" alt="Rooftop pool at sunset"><figcaption>Rooftop pool</figcaption></figure>
+    <figure class="g4"><img src="img/dining.webp" alt="Dining table set for two"><figcaption>Dining</figcaption></figure>
+    <figure class="g5"><img src="img/exterior.webp" alt="The Gallery building"><figcaption>The Gallery</figcaption></figure>
+    <a class="tourbtn" href="#tour">Walk through the apartment</a>
   </div>
-  <div class="wrap" style="margin-top:auto">
-    <h1 class="word">urban luxury</h1>
-    <div class="rail"><span>The Gallery · Boundary Road, East Legon</span><span class="c">Scroll to walk through the apartment</span><span class="r">★ 4.9 · 47 Google reviews</span></div>
+  <div class="below">
+    <div>
+      <h2>Your home in East Legon, for a night or a month.</h2>
+      <p class="lead">Studio, one- and two-bedroom apartments, fully furnished, in a modern block on Boundary Road. Swim on the rooftop, cook in your own kitchen, and check in whenever your flight lands.</p>
+      <div class="hl">
+        <div><i>◆</i><p><b>Rooftop pool</b><span>sunset views over Accra</span></p></div>
+        <div><i>◆</i><p><b>Fitted kitchen</b><span>cook your own meals</span></p></div>
+        <div><i>◆</i><p><b>Gym &amp; restaurant</b><span>on site</span></p></div>
+        <div><i>◆</i><p><b>Open 24 hours</b><span>late arrivals welcome</span></p></div>
+      </div>
+    </div>
+    <aside class="card" aria-label="Check availability">
+      <p class="from"><b>Check availability</b></p>
+      <div class="grid2">
+        <div><label for="hci">Check-in</label><input id="hci" type="date"></div>
+        <div><label for="hco">Check-out</label><input id="hco" type="date"></div>
+        <div class="full"><label for="hap">Apartment · guests</label><select id="hap"><option>Studio · 1–2 guests</option><option selected>1 bedroom · 2 guests</option><option>2 bedrooms · 3–4 guests</option></select></div>
+      </div>
+      <a class="pillbtn" id="hsend" href="#" target="_blank" rel="noopener">Check availability on WhatsApp</a>
+      <p class="note">Booking direct with Urban Luxury · 055 452 9407</p>
+    </aside>
   </div>
 </header>
 
@@ -272,6 +333,19 @@ function upd(){
 document.querySelectorAll('[data-loc]').forEach(a=>a.addEventListener('click',()=>{$('loc').value=a.dataset.loc;upd();}));
 $('bk').addEventListener('submit',e=>e.preventDefault());
 upd();
+})();
+
+// hero availability card
+(function(){
+  const $=id=>document.getElementById(id), iso=d=>d.toISOString().slice(0,10), now=Date.now();
+  $('hci').value=iso(new Date(now+10*864e5)); $('hco').value=iso(new Date(now+13*864e5)); $('hci').min=iso(new Date(now));
+  const fmt=v=>v?new Date(v+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'?';
+  function upd(){
+    const n=Math.round((new Date($('hco').value)-new Date($('hci').value))/864e5);
+    const m=`Hello Urban Luxury, is this available?\nThe Gallery, East Legon\n${$('hap').value}\n${fmt($('hci').value)} → ${fmt($('hco').value)}${n>0?` (${n} night${n>1?'s':''})`:''}`;
+    $('hsend').href='https://wa.me/233554529407?text='+encodeURIComponent(m);
+  }
+  ['hci','hco','hap'].forEach(id=>$(id).addEventListener('input',upd)); upd();
 })();
 </script>
 
